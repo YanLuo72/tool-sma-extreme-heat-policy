@@ -15,8 +15,8 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { CONTENT_PADDING } from "@/config/uiLayout";
+import { BRANDING_ASSETS } from "@/domain/brandingAssets";
 import { useIsMobileViewport } from "@/hooks/useIsMobileViewport";
-import { toPublicAssetUrl } from "@/lib/publicAssetUrl";
 
 function isRouteActive(currentPath: string, target: string): boolean {
   return target === "/" ? currentPath === "/" : currentPath.startsWith(target);
@@ -104,7 +104,9 @@ export function SiteHeader() {
             }}
           >
             <Image
-              src={toPublicAssetUrl("branding/logo-usyd-black.png")}
+              src={BRANDING_ASSETS.usyd.src}
+              srcSet={BRANDING_ASSETS.usyd.srcSet}
+              sizes="102px"
               alt={t("nav.logoAlt")}
               height={35}
               width="auto"
