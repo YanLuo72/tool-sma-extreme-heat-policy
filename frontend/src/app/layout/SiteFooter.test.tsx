@@ -1,6 +1,8 @@
+import { MantineProvider } from "@mantine/core";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { SiteFooter } from "@/app/layout/SiteFooter";
+import { appTheme } from "@/config/mantineTheme";
 
 vi.mock("react-i18next", () => ({
   Trans: ({ i18nKey }: { i18nKey: string }) => i18nKey,
@@ -11,7 +13,11 @@ vi.mock("react-i18next", () => ({
 
 describe("SiteFooter", () => {
   it("renders responsive, lazily loaded USYD and SMA logos", () => {
-    const markup = renderToStaticMarkup(<SiteFooter />);
+    const markup = renderToStaticMarkup(
+      <MantineProvider theme={appTheme}>
+        <SiteFooter />
+      </MantineProvider>,
+    );
 
     expect(markup).toContain('src="/branding/logo-usyd-black-320.webp"');
     expect(markup).toContain(
