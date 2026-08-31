@@ -1,7 +1,9 @@
+import { MantineProvider } from "@mantine/core";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { SiteHeader } from "@/app/layout/SiteHeader";
+import { appTheme } from "@/config/mantineTheme";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -16,9 +18,11 @@ vi.mock("@/hooks/useIsMobileViewport", () => ({
 describe("SiteHeader", () => {
   it("renders the USYD logo with responsive sources without lazy loading", () => {
     const markup = renderToStaticMarkup(
-      <MemoryRouter initialEntries={["/"]}>
-        <SiteHeader />
-      </MemoryRouter>,
+      <MantineProvider theme={appTheme}>
+        <MemoryRouter initialEntries={["/"]}>
+          <SiteHeader />
+        </MemoryRouter>
+      </MantineProvider>,
     );
 
     expect(markup).toContain('src="/branding/logo-usyd-black-320.webp"');
