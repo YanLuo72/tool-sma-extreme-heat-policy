@@ -8,6 +8,10 @@ import { appTheme } from "@/config/mantineTheme";
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
+    i18n: {
+      resolvedLanguage: "en",
+      changeLanguage: vi.fn(),
+    },
   }),
 }));
 
