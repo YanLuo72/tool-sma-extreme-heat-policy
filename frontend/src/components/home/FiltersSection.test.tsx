@@ -46,7 +46,10 @@ const fixtures = vi.hoisted(() => {
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string) => key,
+    t: (key: string, options?: Record<string, unknown>) =>
+      key === "home.sections.filters.sportImageAlt"
+        ? `Selected sport: ${options?.sportLabel}`
+        : key,
   }),
 }));
 
@@ -71,7 +74,7 @@ vi.mock("@/store/homeStore", () => ({
     }) => unknown,
   ) =>
     selector({
-      sport: "SOCCER",
+      sport: "BASKETBALL",
       selectedLocation: fixtures.selectedLocation,
       setSport: () => undefined,
     }),
@@ -131,6 +134,20 @@ function renderFilters(): string {
 }
 
 describe("FiltersSection", () => {
+  it("renders the selected sport with responsive image sources and alt text", () => {
+    fixtures.selectedLocation = null;
+    const markup = renderFilters();
+
+    expect(markup).toContain('src="/sports/basketball-816.webp"');
+    expect(markup).toContain(
+      "/sports/basketball-320.webp 320w, /sports/basketball-640.webp 640w, /sports/basketball-816.webp 816w",
+    );
+    expect(markup).toContain(
+      'sizes="(max-width: 48em) calc(100vw - 4rem), 48rem"',
+    );
+    expect(markup).toContain('alt="Selected sport: sports.basketball"');
+  });
+
   it("announces saved bookmark state in the dropdown", () => {
     fixtures.selectedLocation = fixtures.perth;
     const markup = renderFilters();

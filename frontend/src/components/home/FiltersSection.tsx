@@ -19,17 +19,11 @@ import { SaveLocationModal } from "@/components/home/SaveLocationModal";
 import { SectionCard } from "@/components/ui/SectionCard";
 import { CONTENT_GAP } from "@/config/uiLayout";
 import { isSuggestionAlreadySaved } from "@/domain/savedLocation";
-import {
-  isSportType,
-  sports,
-  toSportAssetName,
-  type SportType,
-} from "@/domain/sport";
+import { isSportType, sports, type SportType } from "@/domain/sport";
 import {
   useHomeLocationSuggest,
   type LocationSuggestErrorReason,
 } from "@/hooks/useHomeLocationSuggest";
-import { toPublicAssetUrl } from "@/lib/publicAssetUrl";
 import { useHomeStore } from "@/store/homeStore";
 import { useSavedLocationsStore } from "@/store/savedLocationsStore";
 
@@ -40,6 +34,7 @@ interface SelectOption<T extends string = string> {
 
 const FIELD_LABEL_WIDTH = 72;
 const SPORT_IMAGE_HEIGHT = 104;
+const SPORT_IMAGE_SIZES = "(max-width: 48em) calc(100vw - 4rem), 48rem";
 const LOCATION_INPUT_CHEVRON_SECTION_WIDTH = 32;
 const LOCATION_SUGGESTION_BOOKMARK_ICON_SIZE = 16;
 
@@ -99,9 +94,7 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
       t("home.sections.filters.selectedSportFallback"),
     [sport, sportOptions, t],
   );
-  const sportImageSrc =
-    selectedSportMeta?.imagePath ??
-    toPublicAssetUrl(`sports/${toSportAssetName(sport)}.webp`);
+  const sportImage = selectedSportMeta?.image;
 
   const {
     locationSearchInput,
@@ -294,9 +287,11 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
         </Group>
 
         <Box h={SPORT_IMAGE_HEIGHT}>
-          {!hasSportImageError ? (
+          {sportImage !== undefined && !hasSportImageError ? (
             <Image
-              src={sportImageSrc}
+              src={sportImage.src}
+              srcSet={sportImage.srcSet}
+              sizes={SPORT_IMAGE_SIZES}
               alt={t("home.sections.filters.sportImageAlt", {
                 sportLabel: selectedSportLabel,
               })}
@@ -319,7 +314,7 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
               <Text c="dimmed" fz="xs" ta="center">
                 {t("home.sections.filters.sportImageHelp", {
                   sportLabel: selectedSportLabel,
-                  path: sportImageSrc,
+                  path: sportImage?.src ?? "",
                 })}
               </Text>
             </Stack>
