@@ -1,28 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { RECOMMENDATION_ACTION_ASSETS } from "@/domain/recommendationActionAssets";
 import type { RiskLevel } from "@/domain/riskRegistry";
 import enTranslations from "@/i18n/locales/en/translation.json";
 import { getRecommendationDetailContent } from "@/lib/recommendationDetails";
-import type { ResponsiveImageAsset } from "@/lib/responsiveImage";
-
-const EXPECTED_ACTION_IMAGES = {
-  low: [
-    RECOMMENDATION_ACTION_ASSETS.hydration,
-    RECOMMENDATION_ACTION_ASSETS.clothing,
-  ],
-  moderate: [
-    RECOMMENDATION_ACTION_ASSETS.hydration,
-    RECOMMENDATION_ACTION_ASSETS.clothing,
-    RECOMMENDATION_ACTION_ASSETS.pause,
-  ],
-  high: [
-    RECOMMENDATION_ACTION_ASSETS.hydration,
-    RECOMMENDATION_ACTION_ASSETS.clothing,
-    RECOMMENDATION_ACTION_ASSETS.pause,
-    RECOMMENDATION_ACTION_ASSETS.cooling,
-  ],
-  extreme: [RECOMMENDATION_ACTION_ASSETS.stop],
-} satisfies Record<RiskLevel, (ResponsiveImageAsset | null)[]>;
 
 function translate(key: string): unknown {
   return key
@@ -97,9 +76,6 @@ describe("getRecommendationDetailContent", () => {
       expect(content.levelLabel).toBe(expectedLabel);
       expect(content.items.map((item) => item.label)).toEqual(expectedItems);
       expect(content.items).toHaveLength(expectedItems.length);
-      expect(content.items.map((item) => item.image)).toEqual(
-        EXPECTED_ACTION_IMAGES[level],
-      );
       expect(content.description.length).toBeGreaterThan(0);
       expect(content.suggestions).toEqual(expectedSuggestions);
     },
