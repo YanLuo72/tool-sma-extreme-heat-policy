@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import {
   isSportType,
   sports,
@@ -6,6 +8,16 @@ import {
   SPORT_TYPE_VALUES,
 } from "@/domain/sport";
 import enTranslation from "@/i18n/locales/en/translation.json";
+
+function getResponsiveImageUrls(image: { src: string; srcSet: string }) {
+  return [
+    image.src,
+    ...image.srcSet
+      .split(",")
+      .map((candidate) => candidate.trim().split(/\s+/)[0])
+      .filter(Boolean),
+  ];
+}
 
 describe("sport registry", () => {
   it("registers Croquet for selection, persistence, and API requests", () => {
@@ -43,5 +55,22 @@ describe("sport registry", () => {
       src: "/sports/walking-522.webp",
       srcSet: "/sports/walking-320.webp 320w, /sports/walking-522.webp 522w",
     });
+  });
+
+  it("points every sport image candidate at an existing public asset", () => {
+    for (const sport of sports) {
+      for (const imageUrl of getResponsiveImageUrls(sport.image)) {
+        const assetPath = join(
+          process.cwd(),
+          "public",
+          imageUrl.replace(/^\//, ""),
+        );
+
+        expect(
+          existsSync(assetPath),
+          `${sport.type} references missing asset ${imageUrl}`,
+        ).toBe(true);
+      }
+    }
   });
 });

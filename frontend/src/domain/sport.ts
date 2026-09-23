@@ -47,7 +47,7 @@ export const DEFAULT_SPORT_TYPE = SportType.Soccer;
 /**
  * Maps an enum value into an asset/translation-friendly name.
  */
-export function toSportAssetName(type: SportType): string {
+function toSportAssetName(type: SportType): string {
   return type.toLowerCase();
 }
 
@@ -59,13 +59,15 @@ export interface SportMeta {
 }
 
 const STANDARD_SPORT_IMAGE_WIDTHS = [320, 640, 816] as const;
-const COMPACT_SPORT_IMAGE_WIDTHS = [320, 522] as const;
 
-function getSportImageWidths(type: SportType): readonly number[] {
-  return type === SportType.Soccer || type === SportType.Walking
-    ? COMPACT_SPORT_IMAGE_WIDTHS
-    : STANDARD_SPORT_IMAGE_WIDTHS;
-}
+const SPORT_IMAGE_WIDTHS_BY_TYPE: Partial<
+  Record<SportType, readonly number[]>
+> = {
+  // Soccer and Walking source images are 522px wide. Do not upscale them to
+  // 640/816 candidates; use the available source width as the largest asset.
+  [SportType.Soccer]: [320, 522],
+  [SportType.Walking]: [320, 522],
+} as const;
 
 export const sports: readonly SportMeta[] = Object.values(SportType).map(
   (type) => {
@@ -77,7 +79,7 @@ export const sports: readonly SportMeta[] = Object.values(SportType).map(
       labelKey: `sports.${assetName}`,
       image: createResponsiveImageAsset({
         assetPath: `sports/${assetName}`,
-        widths: getSportImageWidths(type),
+        widths: SPORT_IMAGE_WIDTHS_BY_TYPE[type] ?? STANDARD_SPORT_IMAGE_WIDTHS,
       }),
     };
   },

@@ -5,6 +5,7 @@ import { FiltersSection } from "@/components/home/FiltersSection";
 import { appTheme } from "@/config/mantineTheme";
 import type { LocationSuggestion } from "@/domain/location";
 import type { SavedLocation } from "@/domain/savedLocation";
+import { getImageLoadFailureUrl } from "@/lib/imageElement";
 
 const fixtures = vi.hoisted(() => {
   const perth: LocationSuggestion = {
@@ -48,7 +49,7 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string, options?: Record<string, unknown>) =>
       key === "home.sections.filters.sportImageAlt"
-        ? `Selected sport: ${options?.sportLabel}`
+        ? `${options?.sportLabel} preview`
         : key,
   }),
 }));
@@ -143,9 +144,24 @@ describe("FiltersSection", () => {
       "/sports/basketball-320.webp 320w, /sports/basketball-640.webp 640w, /sports/basketball-816.webp 816w",
     );
     expect(markup).toContain(
-      'sizes="(max-width: 48em) calc(100vw - 4rem), 48rem"',
+      'sizes="(max-width: 48em) calc(100vw - 3rem), 43.5rem"',
     );
-    expect(markup).toContain('alt="Selected sport: sports.basketball"');
+    expect(markup).toContain('alt="sports.basketball preview"');
+  });
+
+  it("reports the current image candidate when a sport image load fails", () => {
+    expect(
+      getImageLoadFailureUrl({
+        currentSrc: "/sports/basketball-640.webp",
+        src: "/sports/basketball-816.webp",
+      }),
+    ).toBe("/sports/basketball-640.webp");
+    expect(
+      getImageLoadFailureUrl({
+        currentSrc: "",
+        src: "/sports/basketball-816.webp",
+      }),
+    ).toBe("/sports/basketball-816.webp");
   });
 
   it("announces saved bookmark state in the dropdown", () => {

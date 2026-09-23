@@ -24,6 +24,7 @@ import {
   useHomeLocationSuggest,
   type LocationSuggestErrorReason,
 } from "@/hooks/useHomeLocationSuggest";
+import { getImageLoadFailureUrl } from "@/lib/imageElement";
 import { useHomeStore } from "@/store/homeStore";
 import { useSavedLocationsStore } from "@/store/savedLocationsStore";
 
@@ -34,7 +35,10 @@ interface SelectOption<T extends string = string> {
 
 const FIELD_LABEL_WIDTH = 72;
 const SPORT_IMAGE_HEIGHT = 104;
-const SPORT_IMAGE_SIZES = "(max-width: 48em) calc(100vw - 4rem), 48rem";
+// Mirrors the Home layout: on mobile the image sits inside the outer Container
+// and SectionCard padding (4 * 0.75rem = 3rem total). On desktop, Mantine's
+// size="sm" container caps at 45rem and SectionCard removes 1.5rem horizontally.
+const SPORT_IMAGE_SIZES = "(max-width: 48em) calc(100vw - 3rem), 43.5rem";
 const LOCATION_INPUT_CHEVRON_SECTION_WIDTH = 32;
 const LOCATION_SUGGESTION_BOOKMARK_ICON_SIZE = 16;
 
@@ -63,6 +67,9 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
     (state) => state.savedLocations,
   );
   const [hasSportImageError, setHasSportImageError] = useState(false);
+  const [failedSportImageUrl, setFailedSportImageUrl] = useState<string | null>(
+    null,
+  );
 
   /*
   const profileOptions = useMemo<SelectOption<HeatRiskProfile>[]>(
@@ -84,7 +91,7 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
   );
 
   const selectedSportMeta = useMemo(
-    () => sports.find((sportMeta) => sportMeta.type === sport),
+    () => sports.find((sportMeta) => sportMeta.type === sport)!,
     [sport],
   );
 
@@ -178,6 +185,7 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
 
   const handleSportChange = (value: string | null) => {
     setHasSportImageError(false);
+    setFailedSportImageUrl(null);
 
     if (value === null) {
       return;
@@ -287,7 +295,7 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
         </Group>
 
         <Box h={SPORT_IMAGE_HEIGHT}>
-          {sportImage !== undefined && !hasSportImageError ? (
+          {!hasSportImageError ? (
             <Image
               src={sportImage.src}
               srcSet={sportImage.srcSet}
@@ -298,7 +306,12 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
               w="100%"
               h={SPORT_IMAGE_HEIGHT}
               radius="sm"
-              onError={() => setHasSportImageError(true)}
+              onError={(event) => {
+                setFailedSportImageUrl(
+                  getImageLoadFailureUrl(event.currentTarget),
+                );
+                setHasSportImageError(true);
+              }}
             />
           ) : (
             <Stack
@@ -314,7 +327,7 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
               <Text c="dimmed" fz="xs" ta="center">
                 {t("home.sections.filters.sportImageHelp", {
                   sportLabel: selectedSportLabel,
-                  path: sportImage?.src ?? "",
+                  path: failedSportImageUrl ?? sportImage.src,
                 })}
               </Text>
             </Stack>
