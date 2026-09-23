@@ -11,10 +11,12 @@ describe("createResponsiveImageAsset", () => {
       createResponsiveImageAsset({
         assetPath: "actions/hydration",
         widths: [48, 96],
+        sizes: "2.5rem",
       }),
     ).toEqual({
       src: "/actions/hydration-96.webp",
       srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
+      sizes: "2.5rem",
     });
   });
 
@@ -23,7 +25,8 @@ describe("createResponsiveImageAsset", () => {
       createResponsiveImageAsset({
         assetPath: "actions/cooling",
         widths: [96, 48, 96, 48],
-      }).srcSet,
+        sizes: "2.5rem",
+      })?.srcSet,
     ).toBe("/actions/cooling-48.webp 48w, /actions/cooling-96.webp 96w");
   });
 
@@ -32,7 +35,8 @@ describe("createResponsiveImageAsset", () => {
       createResponsiveImageAsset({
         assetPath: "sports/running",
         widths: [320, 816, 640],
-      }).src,
+        sizes: "45rem",
+      })?.src,
     ).toBe("/sports/running-816.webp");
   });
 
@@ -43,11 +47,13 @@ describe("createResponsiveImageAsset", () => {
       createResponsiveImageAsset({
         assetPath: "/actions/pause",
         widths: [48, 96],
+        sizes: "2.5rem",
       }),
     ).toEqual({
       src: "/heat-policy/actions/pause-96.webp",
       srcSet:
         "/heat-policy/actions/pause-48.webp 48w, /heat-policy/actions/pause-96.webp 96w",
+      sizes: "2.5rem",
     });
   });
 
@@ -56,40 +62,59 @@ describe("createResponsiveImageAsset", () => {
       createResponsiveImageAsset({
         assetPath: "  actions/clothing  ",
         widths: [48, 96],
+        sizes: "2.5rem",
       }),
     ).toEqual({
       src: "/actions/clothing-96.webp",
       srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+      sizes: "2.5rem",
     });
   });
 
   it.each(["", "   ", "actions/stop.png", "actions/stop.webp"])(
-    "rejects invalid asset path %j",
+    "returns null for invalid asset path %j",
     (assetPath) => {
-      expect(() =>
-        createResponsiveImageAsset({ assetPath, widths: [48, 96] }),
-      ).toThrow(/assetPath/);
+      expect(
+        createResponsiveImageAsset({
+          assetPath,
+          widths: [48, 96],
+          sizes: "2.5rem",
+        }),
+      ).toBeNull();
     },
   );
 
-  it("rejects an empty widths list", () => {
-    expect(() =>
+  it("returns null for an empty widths list", () => {
+    expect(
       createResponsiveImageAsset({
         assetPath: "actions/stop",
         widths: [],
+        sizes: "2.5rem",
       }),
-    ).toThrow(/widths/);
+    ).toBeNull();
   });
 
-  it.each([0, -1, 48.5, Number.NaN, Number.POSITIVE_INFINITY])(
-    "rejects invalid width %s",
-    (width) => {
-      expect(() =>
-        createResponsiveImageAsset({
-          assetPath: "actions/stop",
-          widths: [48, width],
-        }),
-      ).toThrow(/widths/);
-    },
-  );
+  it("filters invalid widths before sorting and removing duplicates", () => {
+    expect(
+      createResponsiveImageAsset({
+        assetPath: "actions/stop",
+        widths: [96, 0, -1, 48.5, Number.NaN, 48, 96],
+        sizes: "2.5rem",
+      }),
+    ).toEqual({
+      src: "/actions/stop-96.webp",
+      srcSet: "/actions/stop-48.webp 48w, /actions/stop-96.webp 96w",
+      sizes: "2.5rem",
+    });
+  });
+
+  it("returns null when every width is invalid", () => {
+    expect(
+      createResponsiveImageAsset({
+        assetPath: "actions/stop",
+        widths: [0, -1, 48.5, Number.NaN, Number.POSITIVE_INFINITY],
+        sizes: "2.5rem",
+      }),
+    ).toBeNull();
+  });
 });

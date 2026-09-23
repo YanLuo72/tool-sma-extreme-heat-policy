@@ -9,57 +9,68 @@ import {
   toRiskLevel,
 } from "@/domain/riskRegistry";
 import { RISK_LEVEL_META } from "@/domain/riskMeta";
+import type { ResponsiveImageAsset } from "@/lib/responsiveImage";
 
 const EXPECTED_KEY_ICON_ASSETS = {
   low: [
     {
       src: "/actions/hydration-96.webp",
       srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/clothing-96.webp",
       srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+      sizes: "2.5rem",
     },
   ],
   moderate: [
     {
       src: "/actions/hydration-96.webp",
       srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/clothing-96.webp",
       srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/pause-96.webp",
       srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
+      sizes: "2.5rem",
     },
   ],
   high: [
     {
       src: "/actions/hydration-96.webp",
       srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/clothing-96.webp",
       srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/pause-96.webp",
       srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/cooling-96.webp",
       srcSet: "/actions/cooling-48.webp 48w, /actions/cooling-96.webp 96w",
+      sizes: "2.5rem",
     },
   ],
   extreme: [
     {
       src: "/actions/stop-96.webp",
       srcSet: "/actions/stop-48.webp 48w, /actions/stop-96.webp 96w",
+      sizes: "2.5rem",
     },
   ],
-} satisfies Record<RiskLevel, { src: string; srcSet: string }[]>;
+} satisfies Record<RiskLevel, ResponsiveImageAsset[]>;
 
 describe("toRiskLevel", () => {
   it("maps threshold boundaries into the expected risk levels", () => {

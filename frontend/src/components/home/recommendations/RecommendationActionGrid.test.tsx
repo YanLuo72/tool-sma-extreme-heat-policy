@@ -15,6 +15,7 @@ const items: RecommendationDetailItem[] = [
     image: {
       src: "/actions/hydration-96.webp",
       srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
+      sizes: "2.5rem",
     },
     label: "Stay hydrated",
   },
@@ -22,6 +23,7 @@ const items: RecommendationDetailItem[] = [
     image: {
       src: "/actions/clothing-96.webp",
       srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+      sizes: "2.5rem",
     },
     label: "Wear light clothing",
   },
@@ -29,6 +31,7 @@ const items: RecommendationDetailItem[] = [
     image: {
       src: "/actions/pause-96.webp",
       srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
+      sizes: "2.5rem",
     },
     label: "Rest breaks",
   },
@@ -54,7 +57,7 @@ describe("RecommendationActionGrid", () => {
     expect(markup).toMatch(
       /srcset="\/actions\/hydration-48\.webp 48w, \/actions\/hydration-96\.webp 96w"/i,
     );
-    expect(markup).toContain('sizes="40px"');
+    expect(markup).toContain('sizes="2.5rem"');
     expect(markup).toContain('loading="lazy"');
     expect(markup).toContain('alt="Stay hydrated"');
   });

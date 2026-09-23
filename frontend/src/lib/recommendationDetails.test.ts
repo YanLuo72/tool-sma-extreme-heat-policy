@@ -1,58 +1,69 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { RiskLevel } from "@/domain/riskRegistry";
 import enTranslations from "@/i18n/locales/en/translation.json";
 import { getRecommendationDetailContent } from "@/lib/recommendationDetails";
+import type { ResponsiveImageAsset } from "@/lib/responsiveImage";
 
 const EXPECTED_ACTION_IMAGES = {
   low: [
     {
       src: "/actions/hydration-96.webp",
       srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/clothing-96.webp",
       srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+      sizes: "2.5rem",
     },
   ],
   moderate: [
     {
       src: "/actions/hydration-96.webp",
       srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/clothing-96.webp",
       srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/pause-96.webp",
       srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
+      sizes: "2.5rem",
     },
   ],
   high: [
     {
       src: "/actions/hydration-96.webp",
       srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/clothing-96.webp",
       srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/pause-96.webp",
       srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
+      sizes: "2.5rem",
     },
     {
       src: "/actions/cooling-96.webp",
       srcSet: "/actions/cooling-48.webp 48w, /actions/cooling-96.webp 96w",
+      sizes: "2.5rem",
     },
   ],
   extreme: [
     {
       src: "/actions/stop-96.webp",
       srcSet: "/actions/stop-48.webp 48w, /actions/stop-96.webp 96w",
+      sizes: "2.5rem",
     },
   ],
-} satisfies Record<RiskLevel, { src: string; srcSet: string }[]>;
+} satisfies Record<RiskLevel, ResponsiveImageAsset[]>;
 
 function translate(key: string): unknown {
   return key
@@ -65,6 +76,11 @@ function translate(key: string): unknown {
       enTranslations,
     );
 }
+
+afterEach(() => {
+  vi.doUnmock("@/domain/recommendationActionAssets");
+  vi.resetModules();
+});
 
 describe("getRecommendationDetailContent", () => {
   it.each<[RiskLevel, string, string[], string[]]>([
@@ -129,4 +145,37 @@ describe("getRecommendationDetailContent", () => {
       expect(content.suggestions).toEqual(expectedSuggestions);
     },
   );
+
+  it("keeps labels aligned when an action image is unavailable", async () => {
+    vi.resetModules();
+    vi.doMock("@/domain/recommendationActionAssets", () => ({
+      RECOMMENDATION_ACTION_ASSETS: {
+        hydration: null,
+        clothing: {
+          src: "/actions/clothing-96.webp",
+          srcSet:
+            "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+          sizes: "2.5rem",
+        },
+        pause: null,
+        cooling: null,
+        stop: null,
+      },
+    }));
+
+    const { getRecommendationDetailContent: getContent } =
+      await import("@/lib/recommendationDetails");
+
+    expect(getContent("low", translate).items).toEqual([
+      {
+        image: {
+          src: "/actions/clothing-96.webp",
+          srcSet:
+            "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+          sizes: "2.5rem",
+        },
+        label: "Wear light clothing",
+      },
+    ]);
+  });
 });

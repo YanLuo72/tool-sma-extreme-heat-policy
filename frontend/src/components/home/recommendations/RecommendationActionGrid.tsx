@@ -1,10 +1,8 @@
 import { Box, Image, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { CONTENT_GAP } from "@/config/uiLayout";
-import {
-  ACTION_IMAGE_ICON_SIZE,
-  COMPACT_RECOMMENDATION_LAYOUT_QUERY,
-} from "@/config/uiScale";
+import { RECOMMENDATION_ACTION_IMAGE_CONFIG } from "@/config/responsiveImages";
+import { COMPACT_RECOMMENDATION_LAYOUT_QUERY } from "@/config/uiScale";
 import type { RecommendationDetailItem } from "@/lib/recommendationDetails";
 
 interface RecommendationActionGridProps {
@@ -60,11 +58,11 @@ export function RecommendationActionGrid({
             <Image
               src={item.image.src}
               srcSet={item.image.srcSet}
-              sizes="40px"
+              sizes={item.image.sizes}
               loading="lazy"
               alt={item.label}
-              w={ACTION_IMAGE_ICON_SIZE}
-              h={ACTION_IMAGE_ICON_SIZE}
+              w={RECOMMENDATION_ACTION_IMAGE_CONFIG.renderedSize}
+              h={RECOMMENDATION_ACTION_IMAGE_CONFIG.renderedSize}
               fit="contain"
             />
             <Text

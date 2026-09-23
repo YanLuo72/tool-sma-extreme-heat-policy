@@ -8,22 +8,27 @@ describe("RECOMMENDATION_ACTION_ASSETS", () => {
         src: "/actions/hydration-96.webp",
         srcSet:
           "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
+        sizes: "2.5rem",
       },
       clothing: {
         src: "/actions/clothing-96.webp",
         srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
+        sizes: "2.5rem",
       },
       pause: {
         src: "/actions/pause-96.webp",
         srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
+        sizes: "2.5rem",
       },
       cooling: {
         src: "/actions/cooling-96.webp",
         srcSet: "/actions/cooling-48.webp 48w, /actions/cooling-96.webp 96w",
+        sizes: "2.5rem",
       },
       stop: {
         src: "/actions/stop-96.webp",
         srcSet: "/actions/stop-48.webp 48w, /actions/stop-96.webp 96w",
+        sizes: "2.5rem",
       },
     });
   });

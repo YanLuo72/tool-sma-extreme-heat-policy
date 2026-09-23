@@ -8,7 +8,7 @@ export interface RiskRegistryEntry {
   scoreLowerInclusive: number;
   scoreUpperExclusive: number;
   color: string;
-  keyIconAssets: ResponsiveImageAsset[];
+  keyIconAssets: (ResponsiveImageAsset | null)[];
   levelKey: string;
   levelShortKey: string;
   keyRecommendationsKey: string;

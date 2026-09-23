@@ -53,7 +53,10 @@ export function getRecommendationDetailContent(
         image,
         label: labels[index] ?? "",
       }))
-      .filter((item) => item.label),
+      .filter(
+        (item): item is RecommendationDetailItem =>
+          item.image !== null && item.label !== "",
+      ),
     description: toString(translate(details.detailedDescriptionKey)),
     suggestions: toStringArray(
       translate(details.detailedSuggestionsKey, {

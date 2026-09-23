@@ -13,7 +13,7 @@ export { RISK_LEVELS } from "@/domain/riskRegistry";
 interface LegacyRiskMetaEntry {
   color: string;
   scoreUpperExclusive: number;
-  keyIconAssets: ResponsiveImageAsset[];
+  keyIconAssets: (ResponsiveImageAsset | null)[];
   i18nLevelKey: string;
   i18nLevelShortKey: string;
 }

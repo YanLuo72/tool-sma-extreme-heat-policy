@@ -3,6 +3,7 @@ import { toPublicAssetUrl } from "@/lib/publicAssetUrl";
 export interface ResponsiveImageAsset {
   readonly src: string;
   readonly srcSet: string;
+  readonly sizes: string;
 }
 
 export interface CreateResponsiveImageAssetOptions {
@@ -10,35 +11,34 @@ export interface CreateResponsiveImageAssetOptions {
   assetPath: string;
   /** Available intrinsic image widths. */
   widths: readonly number[];
+  /** Browser source-size expression matching the rendered image size. */
+  sizes: string;
 }
 
 /** Creates responsive image URLs for width-suffixed WebP assets. */
 export function createResponsiveImageAsset({
   assetPath,
   widths,
-}: CreateResponsiveImageAssetOptions): ResponsiveImageAsset {
-  const normalizedAssetPath = assetPath.trim().replace(/^\/+/, "");
+  sizes,
+}: CreateResponsiveImageAssetOptions): ResponsiveImageAsset | null {
+  const normalizedAssetPath = assetPath.trim();
 
   if (normalizedAssetPath === "") {
-    throw new Error("Responsive image assetPath must not be empty.");
+    return null;
   }
 
   if (/\.[^/]*$/.test(normalizedAssetPath)) {
-    throw new Error(
-      "Responsive image assetPath must not include a file extension.",
-    );
+    return null;
   }
 
-  if (
-    widths.length === 0 ||
-    widths.some((width) => !Number.isInteger(width) || width <= 0)
-  ) {
-    throw new Error("Responsive image widths must contain positive integers.");
+  const normalizedWidths = [
+    ...new Set(widths.filter((width) => Number.isInteger(width) && width > 0)),
+  ].sort((firstWidth, secondWidth) => firstWidth - secondWidth);
+
+  if (normalizedWidths.length === 0) {
+    return null;
   }
 
-  const normalizedWidths = [...new Set(widths)].sort(
-    (firstWidth, secondWidth) => firstWidth - secondWidth,
-  );
   const toCandidateUrl = (width: number) =>
     toPublicAssetUrl(`${normalizedAssetPath}-${width}.webp`);
   const fallbackWidth = normalizedWidths[normalizedWidths.length - 1];
@@ -48,5 +48,6 @@ export function createResponsiveImageAsset({
     srcSet: normalizedWidths
       .map((width) => `${toCandidateUrl(width)} ${width}w`)
       .join(", "),
+    sizes,
   };
 }
