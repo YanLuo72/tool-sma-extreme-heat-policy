@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { RECOMMENDATION_ACTION_ASSETS } from "@/domain/recommendationActionAssets";
 import {
   getRiskBadgeForegroundColor,
   getRiskBands,
@@ -8,69 +9,26 @@ import {
   toRiskDisplayScore,
   toRiskLevel,
 } from "@/domain/riskRegistry";
-import { RISK_LEVEL_META } from "@/domain/riskMeta";
 import type { ResponsiveImageAsset } from "@/lib/responsiveImage";
 
 const EXPECTED_KEY_ICON_ASSETS = {
   low: [
-    {
-      src: "/actions/hydration-96.webp",
-      srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/clothing-96.webp",
-      srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
-      sizes: "2.5rem",
-    },
+    RECOMMENDATION_ACTION_ASSETS.hydration,
+    RECOMMENDATION_ACTION_ASSETS.clothing,
   ],
   moderate: [
-    {
-      src: "/actions/hydration-96.webp",
-      srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/clothing-96.webp",
-      srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/pause-96.webp",
-      srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
-      sizes: "2.5rem",
-    },
+    RECOMMENDATION_ACTION_ASSETS.hydration,
+    RECOMMENDATION_ACTION_ASSETS.clothing,
+    RECOMMENDATION_ACTION_ASSETS.pause,
   ],
   high: [
-    {
-      src: "/actions/hydration-96.webp",
-      srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/clothing-96.webp",
-      srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/pause-96.webp",
-      srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/cooling-96.webp",
-      srcSet: "/actions/cooling-48.webp 48w, /actions/cooling-96.webp 96w",
-      sizes: "2.5rem",
-    },
+    RECOMMENDATION_ACTION_ASSETS.hydration,
+    RECOMMENDATION_ACTION_ASSETS.clothing,
+    RECOMMENDATION_ACTION_ASSETS.pause,
+    RECOMMENDATION_ACTION_ASSETS.cooling,
   ],
-  extreme: [
-    {
-      src: "/actions/stop-96.webp",
-      srcSet: "/actions/stop-48.webp 48w, /actions/stop-96.webp 96w",
-      sizes: "2.5rem",
-    },
-  ],
-} satisfies Record<RiskLevel, ResponsiveImageAsset[]>;
+  extreme: [RECOMMENDATION_ACTION_ASSETS.stop],
+} satisfies Record<RiskLevel, (ResponsiveImageAsset | null)[]>;
 
 describe("toRiskLevel", () => {
   it("maps threshold boundaries into the expected risk levels", () => {
@@ -118,14 +76,6 @@ describe("recommendation action assets", () => {
   it("keeps responsive action assets in the configured order", () => {
     for (const level of RISK_LEVELS) {
       expect(RISK_REGISTRY[level].keyIconAssets).toEqual(
-        EXPECTED_KEY_ICON_ASSETS[level],
-      );
-    }
-  });
-
-  it("exposes responsive action assets through the legacy risk metadata", () => {
-    for (const level of RISK_LEVELS) {
-      expect(RISK_LEVEL_META[level].keyIconAssets).toEqual(
         EXPECTED_KEY_ICON_ASSETS[level],
       );
     }

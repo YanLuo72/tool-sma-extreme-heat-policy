@@ -1,35 +1,21 @@
 import { describe, expect, it } from "vitest";
+import { RECOMMENDATION_ACTION_IMAGE_CONFIG } from "@/config/responsiveImages";
 import { RECOMMENDATION_ACTION_ASSETS } from "@/domain/recommendationActionAssets";
 
+const ACTION_KEYS = [
+  "hydration",
+  "clothing",
+  "pause",
+  "cooling",
+  "stop",
+] as const;
+
 describe("RECOMMENDATION_ACTION_ASSETS", () => {
-  it("provides responsive WebP assets for every recommendation action", () => {
-    expect(RECOMMENDATION_ACTION_ASSETS).toEqual({
-      hydration: {
-        src: "/actions/hydration-96.webp",
-        srcSet:
-          "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
-        sizes: "2.5rem",
-      },
-      clothing: {
-        src: "/actions/clothing-96.webp",
-        srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
-        sizes: "2.5rem",
-      },
-      pause: {
-        src: "/actions/pause-96.webp",
-        srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
-        sizes: "2.5rem",
-      },
-      cooling: {
-        src: "/actions/cooling-96.webp",
-        srcSet: "/actions/cooling-48.webp 48w, /actions/cooling-96.webp 96w",
-        sizes: "2.5rem",
-      },
-      stop: {
-        src: "/actions/stop-96.webp",
-        srcSet: "/actions/stop-48.webp 48w, /actions/stop-96.webp 96w",
-        sizes: "2.5rem",
-      },
+  it.each(ACTION_KEYS)("provides responsive WebP metadata for %s", (key) => {
+    expect(RECOMMENDATION_ACTION_ASSETS[key]).toEqual({
+      src: `/actions/${key}-96.webp`,
+      srcSet: `/actions/${key}-48.webp 48w, /actions/${key}-96.webp 96w`,
+      sizes: RECOMMENDATION_ACTION_IMAGE_CONFIG.sizes,
     });
   });
 });

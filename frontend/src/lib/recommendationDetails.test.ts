@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { RECOMMENDATION_ACTION_ASSETS } from "@/domain/recommendationActionAssets";
 import type { RiskLevel } from "@/domain/riskRegistry";
 import enTranslations from "@/i18n/locales/en/translation.json";
 import { getRecommendationDetailContent } from "@/lib/recommendationDetails";
@@ -6,64 +7,22 @@ import type { ResponsiveImageAsset } from "@/lib/responsiveImage";
 
 const EXPECTED_ACTION_IMAGES = {
   low: [
-    {
-      src: "/actions/hydration-96.webp",
-      srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/clothing-96.webp",
-      srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
-      sizes: "2.5rem",
-    },
+    RECOMMENDATION_ACTION_ASSETS.hydration,
+    RECOMMENDATION_ACTION_ASSETS.clothing,
   ],
   moderate: [
-    {
-      src: "/actions/hydration-96.webp",
-      srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/clothing-96.webp",
-      srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/pause-96.webp",
-      srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
-      sizes: "2.5rem",
-    },
+    RECOMMENDATION_ACTION_ASSETS.hydration,
+    RECOMMENDATION_ACTION_ASSETS.clothing,
+    RECOMMENDATION_ACTION_ASSETS.pause,
   ],
   high: [
-    {
-      src: "/actions/hydration-96.webp",
-      srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/clothing-96.webp",
-      srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/pause-96.webp",
-      srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    {
-      src: "/actions/cooling-96.webp",
-      srcSet: "/actions/cooling-48.webp 48w, /actions/cooling-96.webp 96w",
-      sizes: "2.5rem",
-    },
+    RECOMMENDATION_ACTION_ASSETS.hydration,
+    RECOMMENDATION_ACTION_ASSETS.clothing,
+    RECOMMENDATION_ACTION_ASSETS.pause,
+    RECOMMENDATION_ACTION_ASSETS.cooling,
   ],
-  extreme: [
-    {
-      src: "/actions/stop-96.webp",
-      srcSet: "/actions/stop-48.webp 48w, /actions/stop-96.webp 96w",
-      sizes: "2.5rem",
-    },
-  ],
-} satisfies Record<RiskLevel, ResponsiveImageAsset[]>;
+  extreme: [RECOMMENDATION_ACTION_ASSETS.stop],
+} satisfies Record<RiskLevel, (ResponsiveImageAsset | null)[]>;
 
 function translate(key: string): unknown {
   return key

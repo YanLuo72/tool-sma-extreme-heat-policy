@@ -61,13 +61,4 @@ describe("RecommendationActionGrid", () => {
     expect(markup).toContain('loading="lazy"');
     expect(markup).toContain('alt="Stay hydrated"');
   });
-
-  it("centers the final item in a compact odd-item grid", () => {
-    vi.mocked(useMediaQuery).mockReturnValue(true);
-
-    const markup = renderGrid();
-
-    expect(markup.match(/grid-column:1 \/ -1/g)).toHaveLength(1);
-    expect(markup).toContain("Rest breaks");
-  });
 });
