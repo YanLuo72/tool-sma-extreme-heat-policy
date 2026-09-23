@@ -1,3 +1,4 @@
+import { getSportImageConfig } from "@/config/responsiveImages";
 import {
   createResponsiveImageAsset,
   type ResponsiveImageAsset,
@@ -55,23 +56,13 @@ export interface SportMeta {
   type: SportType;
   assetName: string;
   labelKey: string;
-  image: ResponsiveImageAsset;
+  image: ResponsiveImageAsset | null;
 }
-
-const STANDARD_SPORT_IMAGE_WIDTHS = [320, 640, 816] as const;
-
-const SPORT_IMAGE_WIDTHS_BY_TYPE: Partial<
-  Record<SportType, readonly number[]>
-> = {
-  // Soccer and Walking source images are 522px wide. Do not upscale them to
-  // 640/816 candidates; use the available source width as the largest asset.
-  [SportType.Soccer]: [320, 522],
-  [SportType.Walking]: [320, 522],
-} as const;
 
 export const sports: readonly SportMeta[] = Object.values(SportType).map(
   (type) => {
     const assetName = toSportAssetName(type);
+    const imageConfig = getSportImageConfig(assetName);
 
     return {
       type,
@@ -79,7 +70,8 @@ export const sports: readonly SportMeta[] = Object.values(SportType).map(
       labelKey: `sports.${assetName}`,
       image: createResponsiveImageAsset({
         assetPath: `sports/${assetName}`,
-        widths: SPORT_IMAGE_WIDTHS_BY_TYPE[type] ?? STANDARD_SPORT_IMAGE_WIDTHS,
+        widths: imageConfig.widths,
+        sizes: imageConfig.sizes,
       }),
     };
   },

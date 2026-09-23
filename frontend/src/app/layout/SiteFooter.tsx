@@ -48,18 +48,14 @@ export function SiteFooter() {
     {
       key: "usyd",
       label: t("footer.developedBy"),
-      image: BRANDING_ASSETS.usyd,
-      sizes: "145px",
+      image: BRANDING_ASSETS.footerUsyd,
       alt: t("footer.usydLogoAlt"),
-      height: 50,
     },
     {
       key: "sma",
       label: t("footer.endorsedBy"),
-      image: BRANDING_ASSETS.sma,
-      sizes: "125px",
+      image: BRANDING_ASSETS.footerSma,
       alt: t("footer.smaLogoAlt"),
-      height: 50,
     },
   ] as const;
 
@@ -74,16 +70,18 @@ export function SiteFooter() {
           justifyContent: "flex-start",
         }}
       >
-        <Image
-          src={logo.image.src}
-          srcSet={logo.image.srcSet}
-          sizes={logo.sizes}
-          loading="lazy"
-          alt={logo.alt}
-          w="auto"
-          h={logo.height}
-          fit="contain"
-        />
+        {logo.image !== null ? (
+          <Image
+            src={logo.image.src}
+            srcSet={logo.image.srcSet}
+            sizes={logo.image.sizes}
+            loading="lazy"
+            alt={logo.alt}
+            w="auto"
+            h={logo.image.renderedHeight}
+            fit="contain"
+          />
+        ) : null}
       </Box>
     </Stack>
   );

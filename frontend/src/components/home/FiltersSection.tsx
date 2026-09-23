@@ -35,10 +35,6 @@ interface SelectOption<T extends string = string> {
 
 const FIELD_LABEL_WIDTH = 72;
 const SPORT_IMAGE_HEIGHT = 104;
-// Mirrors the Home layout: on mobile the image sits inside the outer Container
-// and SectionCard padding (4 * 0.75rem = 3rem total). On desktop, Mantine's
-// size="sm" container caps at 45rem and SectionCard removes 1.5rem horizontally.
-const SPORT_IMAGE_SIZES = "(max-width: 48em) calc(100vw - 3rem), 43.5rem";
 const LOCATION_INPUT_CHEVRON_SECTION_WIDTH = 32;
 const LOCATION_SUGGESTION_BOOKMARK_ICON_SIZE = 16;
 
@@ -295,11 +291,11 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
         </Group>
 
         <Box h={SPORT_IMAGE_HEIGHT}>
-          {!hasSportImageError ? (
+          {!hasSportImageError && sportImage !== null ? (
             <Image
               src={sportImage.src}
               srcSet={sportImage.srcSet}
-              sizes={SPORT_IMAGE_SIZES}
+              sizes={sportImage.sizes}
               alt={t("home.sections.filters.sportImageAlt", {
                 sportLabel: selectedSportLabel,
               })}
@@ -327,7 +323,10 @@ export function FiltersSection({ onLocationError }: FiltersSectionProps) {
               <Text c="dimmed" fz="xs" ta="center">
                 {t("home.sections.filters.sportImageHelp", {
                   sportLabel: selectedSportLabel,
-                  path: failedSportImageUrl ?? sportImage.src,
+                  path:
+                    failedSportImageUrl ??
+                    sportImage?.src ??
+                    `sports/${selectedSportMeta.assetName}`,
                 })}
               </Text>
             </Stack>

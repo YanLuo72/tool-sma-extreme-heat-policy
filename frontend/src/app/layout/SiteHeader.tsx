@@ -31,6 +31,7 @@ export function SiteHeader() {
   const isMobile = useIsMobileViewport();
   const location = useLocation();
   const { t } = useTranslation();
+  const headerLogo = BRANDING_ASSETS.headerUsyd;
   const navItems = [
     { label: t("nav.home"), to: "/" },
     { label: t("nav.about"), to: "/about" },
@@ -94,26 +95,30 @@ export function SiteHeader() {
             columnGap: "12px",
           }}
         >
-          <Anchor
-            component={Link}
-            to="/"
-            onClick={close}
-            style={{
-              justifySelf: "start",
-              display: "inline-flex",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              src={BRANDING_ASSETS.usyd.src}
-              srcSet={BRANDING_ASSETS.usyd.srcSet}
-              sizes="102px"
-              alt={t("nav.logoAlt")}
-              height={35}
-              width="auto"
-              fit="contain"
-            />
-          </Anchor>
+          {headerLogo !== null ? (
+            <Anchor
+              component={Link}
+              to="/"
+              onClick={close}
+              style={{
+                justifySelf: "start",
+                display: "inline-flex",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                src={headerLogo.src}
+                srcSet={headerLogo.srcSet}
+                sizes={headerLogo.sizes}
+                alt={t("nav.logoAlt")}
+                h={headerLogo.renderedHeight}
+                w="auto"
+                fit="contain"
+              />
+            </Anchor>
+          ) : (
+            <Box aria-hidden style={{ justifySelf: "start" }} />
+          )}
 
           <Text
             fw={700}
