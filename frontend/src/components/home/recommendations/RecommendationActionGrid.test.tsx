@@ -4,37 +4,21 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { RecommendationActionGrid } from "@/components/home/recommendations/RecommendationActionGrid";
 import { appTheme } from "@/config/mantineTheme";
+import { RECOMMENDATION_ACTION_ASSETS } from "@/domain/recommendationActionAssets";
 import type { RecommendationDetailItem } from "@/lib/recommendationDetails";
 
 vi.mock("@mantine/hooks", () => ({
   useMediaQuery: vi.fn(),
 }));
 
+const hydrationImage = RECOMMENDATION_ACTION_ASSETS.hydration;
+
+if (hydrationImage === null) {
+  throw new Error("Hydration action image must be configured for this test.");
+}
+
 const items: RecommendationDetailItem[] = [
-  {
-    image: {
-      src: "/actions/hydration-96.webp",
-      srcSet: "/actions/hydration-48.webp 48w, /actions/hydration-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    label: "Stay hydrated",
-  },
-  {
-    image: {
-      src: "/actions/clothing-96.webp",
-      srcSet: "/actions/clothing-48.webp 48w, /actions/clothing-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    label: "Wear light clothing",
-  },
-  {
-    image: {
-      src: "/actions/pause-96.webp",
-      srcSet: "/actions/pause-48.webp 48w, /actions/pause-96.webp 96w",
-      sizes: "2.5rem",
-    },
-    label: "Rest breaks",
-  },
+  { image: hydrationImage, label: "Stay hydrated" },
 ];
 
 function renderGrid(gridItems: RecommendationDetailItem[] = items): string {
@@ -53,9 +37,9 @@ describe("RecommendationActionGrid", () => {
   it("renders responsive lazy-loaded recommendation images", () => {
     const markup = renderGrid([items[0]]);
 
-    expect(markup).toContain('src="/actions/hydration-96.webp"');
+    expect(markup).toContain('src="/actions/hydration-192.webp"');
     expect(markup).toMatch(
-      /srcset="\/actions\/hydration-48\.webp 48w, \/actions\/hydration-96\.webp 96w"/i,
+      /srcset="\/actions\/hydration-48\.webp 48w, \/actions\/hydration-96\.webp 96w, \/actions\/hydration-192\.webp 192w"/i,
     );
     expect(markup).toContain('sizes="2.5rem"');
     expect(markup).toContain('loading="lazy"');
