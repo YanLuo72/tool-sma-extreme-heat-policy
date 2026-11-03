@@ -31,6 +31,28 @@ export function isCoolingOptionId(value: unknown): value is CoolingOptionId {
 }
 
 /**
+ * Identifies the presentation-only full-selection state.
+ *
+ * The domain still treats a full selection as configured preferences. The
+ * Home UI can use this predicate to show its dedicated all-methods label.
+ */
+export function isAllCoolingMethodsSelected(
+  selection: CoolingSelection<CoolingOptionId>,
+): boolean {
+  if (
+    !selection.configured ||
+    selection.selectedOptionIds.length !== ACTIVE_COOLING_OPTION_IDS.length
+  ) {
+    return false;
+  }
+
+  const selectedOptionIds = new Set(selection.selectedOptionIds);
+  return ACTIVE_COOLING_OPTION_IDS.every((optionId) =>
+    selectedOptionIds.has(optionId),
+  );
+}
+
+/**
  * Browser-owned Active Cooling preference shared by the domain and Home UI.
  *
  * The discriminant keeps "not configured" distinct from "configured with no

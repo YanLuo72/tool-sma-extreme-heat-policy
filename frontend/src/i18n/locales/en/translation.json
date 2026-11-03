@@ -477,13 +477,13 @@
       },
       "high": {
         "description": "Active cooling strategies should be applied during scheduled and additional rest breaks, or before and during activity if play is continuous. Below are strategies that have been shown to effectively reduce body temperature. The suitability and feasibility of each strategy will depend on the type of sport or exercise you are performing.",
-        "suggestions": [
-          "Drinking cold fluids and/or ice slushies before exercise commences. Note that cold water and ice slushy ingestion during exercise is less effective for cooling.",
-          "Submerging your arms/feet in cold water.",
-          "Water dousing - wetting your skin with cool water using a sponge or a spray bottle helps increase evaporation, which is the most effective cooling mechanism in the heat.",
-          "Ice packs/towels - placing an ice pack or damp towel filled with crushed ice around your neck.",
-          "Electric (misting) fans - outdoor fans can help keep your body cool, especially when combined with a water misting system."
-        ]
+        "suggestions": {
+          "cold-fluids-or-slushies": "Drinking cold fluids and/or ice slushies before exercise commences. Note that cold water and ice slushy ingestion during exercise is less effective for cooling.",
+          "arm-or-foot-immersion": "Submerging your arms/feet in cold water.",
+          "water-dousing": "Water dousing - wetting your skin with cool water using a sponge or a spray bottle helps increase evaporation, which is the most effective cooling mechanism in the heat.",
+          "ice-packs-or-towels": "Ice packs/towels - placing an ice pack or damp towel filled with crushed ice around your neck.",
+          "fans": "Electric (misting) fans - outdoor fans can help keep your body cool, especially when combined with a water misting system."
+        }
       },
       "extreme": {
         "description": "Exercise/play should be suspended. If play has commenced, then all activities should be stopped as soon as possible.",

@@ -1,5 +1,6 @@
 import {
   ACTIVE_COOLING_METHOD_IDS,
+  type ActiveCoolingMethodId,
   type ActiveCoolingResolution,
 } from "@/domain/activeCooling";
 import {
@@ -21,6 +22,10 @@ export interface RecommendationDetailContent {
   items: RecommendationDetailItem[];
   description: string;
   suggestions: string[];
+  /** Keyed Active Cooling copy used for Home filtering. */
+  suggestionsByMethodId?: Readonly<
+    Partial<Record<ActiveCoolingMethodId, string>>
+  >;
 }
 
 export interface PersonalisedHomeRecommendationContent {
@@ -41,6 +46,41 @@ function toStringArray(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === "string");
 }
 
+function toStringValues(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return toStringArray(value);
+  }
+
+  if (value === null || typeof value !== "object") {
+    return [];
+  }
+
+  return Object.values(value).filter(
+    (item): item is string => typeof item === "string",
+  );
+}
+
+function toCompleteActiveCoolingSuggestionMap(
+  value: unknown,
+): Readonly<Partial<Record<ActiveCoolingMethodId, string>>> | undefined {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return undefined;
+  }
+
+  const record = value as Record<string, unknown>;
+  const result: Partial<Record<ActiveCoolingMethodId, string>> = {};
+
+  for (const methodId of ACTIVE_COOLING_METHOD_IDS) {
+    const text = record[methodId];
+    if (typeof text !== "string" || text === "") {
+      return undefined;
+    }
+    result[methodId] = text;
+  }
+
+  return result;
+}
+
 function toString(value: unknown): string {
   return typeof value === "string" ? value : "";
 }
@@ -58,6 +98,13 @@ export function getRecommendationDetailContent(
       returnObjects: true,
     }),
   );
+  const translatedSuggestions = translate(details.detailedSuggestionsKey, {
+    returnObjects: true,
+  });
+  const suggestionsByMethodId =
+    level === "high"
+      ? toCompleteActiveCoolingSuggestionMap(translatedSuggestions)
+      : undefined;
 
   return {
     level,
@@ -70,11 +117,8 @@ export function getRecommendationDetailContent(
       }))
       .filter((item) => item.label !== ""),
     description: toString(translate(details.detailedDescriptionKey)),
-    suggestions: toStringArray(
-      translate(details.detailedSuggestionsKey, {
-        returnObjects: true,
-      }),
-    ),
+    suggestions: toStringValues(suggestionsByMethodId ?? translatedSuggestions),
+    suggestionsByMethodId,
   };
 }
 
@@ -93,11 +137,26 @@ export function personaliseHomeRecommendationContent(
     };
   }
 
-  const visibleMethodIds = new Set(resolution.visibleMethodIds);
-  const suggestions = content.suggestions.filter((_suggestion, index) => {
-    const methodId = ACTIVE_COOLING_METHOD_IDS[index];
+  const suggestionsByMethodId = content.suggestionsByMethodId;
 
-    return methodId !== undefined && visibleMethodIds.has(methodId);
+  // A malformed or stale translation contract should leave Home advice
+  // complete rather than hide a method using an unsafe positional fallback.
+  if (
+    !suggestionsByMethodId ||
+    !ACTIVE_COOLING_METHOD_IDS.every(
+      (methodId) => typeof suggestionsByMethodId[methodId] === "string",
+    )
+  ) {
+    return {
+      content,
+      showPrepareCoolingReminder: resolution.showPrepareReminder,
+    };
+  }
+
+  const visibleMethodIds = new Set(resolution.visibleMethodIds);
+  const suggestions = ACTIVE_COOLING_METHOD_IDS.flatMap((methodId) => {
+    const text = suggestionsByMethodId[methodId];
+    return visibleMethodIds.has(methodId) && text !== undefined ? [text] : [];
   });
 
   return {

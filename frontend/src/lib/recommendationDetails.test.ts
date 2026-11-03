@@ -1,27 +1,33 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type {
-  ActiveCoolingMethodId,
-  ActiveCoolingResolution,
+import {
+  ACTIVE_COOLING_METHOD_IDS,
+  type ActiveCoolingMethodId,
+  type ActiveCoolingResolution,
 } from "@/domain/activeCooling";
 import type { RiskLevel } from "@/domain/riskRegistry";
 import { RECOMMENDATION_ACTION_ASSETS } from "@/domain/recommendationActionAssets";
 import enTranslations from "@/i18n/locales/en/translation.json";
+import zhTranslations from "@/i18n/locales/zh-CN/translation.json";
 import {
   getRecommendationDetailContent,
   personaliseHomeRecommendationContent,
 } from "@/lib/recommendationDetails";
 
-function translate(key: string): unknown {
-  return key
-    .split(".")
-    .reduce<unknown>(
-      (value, segment) =>
-        value !== null && typeof value === "object" && segment in value
-          ? (value as Record<string, unknown>)[segment]
-          : undefined,
-      enTranslations,
-    );
+function createTranslate(translations: unknown) {
+  return (key: string): unknown =>
+    key
+      .split(".")
+      .reduce<unknown>(
+        (value, segment) =>
+          value !== null && typeof value === "object" && segment in value
+            ? (value as Record<string, unknown>)[segment]
+            : undefined,
+        translations,
+      );
 }
+
+const translate = createTranslate(enTranslations);
+const translateZh = createTranslate(zhTranslations);
 
 afterEach(() => {
   vi.doUnmock("@/domain/recommendationActionAssets");
@@ -173,6 +179,23 @@ describe("getRecommendationDetailContent", () => {
 });
 
 describe("personaliseHomeRecommendationContent", () => {
+  it.each<[string, ReturnType<typeof createTranslate>]>([
+    ["en", translate],
+    ["zh-CN", translateZh],
+  ])(
+    "keeps all five Active Cooling suggestions keyed in %s",
+    (_language, t) => {
+      const content = getRecommendationDetailContent("high", t);
+
+      expect(Object.keys(content.suggestionsByMethodId ?? {})).toEqual(
+        ACTIVE_COOLING_METHOD_IDS,
+      );
+      expect(content.suggestions).toHaveLength(
+        ACTIVE_COOLING_METHOD_IDS.length,
+      );
+    },
+  );
+
   it.each<[ActiveCoolingMethodId, number]>([
     ["cold-fluids-or-slushies", 0],
     ["arm-or-foot-immersion", 1],
@@ -181,6 +204,9 @@ describe("personaliseHomeRecommendationContent", () => {
     ["fans", 4],
   ])("maps %s to its policy suggestion", (methodId, suggestionIndex) => {
     const content = getRecommendationDetailContent("high", translate);
+    expect(Object.keys(content.suggestionsByMethodId ?? {})).toEqual(
+      ACTIVE_COOLING_METHOD_IDS,
+    );
     const resolution: ActiveCoolingResolution = {
       visibleMethodIds: [methodId],
       showPrepareReminder: false,
@@ -246,5 +272,23 @@ describe("personaliseHomeRecommendationContent", () => {
     expect(result.content).not.toBe(content);
     expect(result.content.suggestions).not.toBe(content.suggestions);
     expect(result.showPrepareCoolingReminder).toBe(true);
+  });
+
+  it("keeps Home advice complete when suggestion metadata is invalid", () => {
+    const content = getRecommendationDetailContent("high", translate);
+    const invalidContent = {
+      ...content,
+      suggestionsByMethodId: {
+        fans: content.suggestionsByMethodId?.fans,
+      },
+    };
+
+    const result = personaliseHomeRecommendationContent(invalidContent, {
+      visibleMethodIds: ["fans"],
+      showPrepareReminder: false,
+    });
+
+    expect(result.content.suggestions).toEqual(content.suggestions);
+    expect(result.showPrepareCoolingReminder).toBe(false);
   });
 });
