@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { I18nextProvider } from "react-i18next";
 import { HomeRecommendationDetails } from "@/components/home/recommendations/HomeRecommendationDetails";
 import { RecommendationLevelDetails } from "@/components/home/recommendations/RecommendationLevelDetails";
-import type { CoolingOptionId, CoolingSelection } from "@/domain/activeCooling";
+import {
+  ACTIVE_COOLING_OPTION_IDS,
+  type CoolingOptionId,
+  type CoolingSelection,
+} from "@/domain/activeCooling";
 import type { RiskLevel } from "@/domain/riskRegistry";
 import { i18n } from "@/i18n/i18n";
 import { getRecommendationDetailContent } from "@/lib/recommendationDetails";
@@ -46,6 +50,25 @@ describe("HomeRecommendationDetails", () => {
       expect(markup).not.toContain('role="note"');
     },
   );
+  it.each([
+    { language: "en", status: "Personalised" },
+    { language: "zh-CN", status: "已个性化" },
+  ])(
+    "keeps all selected methods personalised without a reminder in $language",
+    async ({ language, status }) => {
+      await i18n.changeLanguage(language);
+      const { markup, content } = renderDetails("high", {
+        configured: true,
+        selectedOptionIds: [...ACTIVE_COOLING_OPTION_IDS],
+      });
+
+      expect(markup).toContain(status);
+      expect(markup.match(/<li\b/g)).toHaveLength(5);
+      for (const text of content.suggestions) expect(markup).toContain(text);
+      expect(markup).not.toContain('role="note"');
+    },
+  );
+
   it("filters selected methods in policy order and preserves the grid, description and footer", () => {
     const { markup, content } = renderDetails("high", states[1]);
     expect(markup.match(/<li\b/g)).toHaveLength(2);

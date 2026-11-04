@@ -7,7 +7,11 @@ import {
   it,
   vi,
 } from "vitest";
-import type { CoolingOptionId, CoolingSelection } from "@/domain/activeCooling";
+import {
+  ACTIVE_COOLING_OPTION_IDS,
+  type CoolingOptionId,
+  type CoolingSelection,
+} from "@/domain/activeCooling";
 import { DEFAULT_HEAT_RISK_PROFILE } from "@/domain/heatRiskProfile";
 import { DEFAULT_SPORT_TYPE } from "@/domain/sport";
 
@@ -72,8 +76,11 @@ describe("coolingSelectionStore", () => {
   );
 
   it.each([
-    { ids: ["unknown-option", "fans", "fans"], expected: ["fans"] },
-    { ids: ["unknown-option"], expected: [] },
+    {
+      ids: ["unknown-option", "fans", "fans"],
+      expected: { configured: true, selectedOptionIds: ["fans"] },
+    },
+    { ids: ["unknown-option"], expected: { configured: false } },
   ])(
     "initializes with validated IDs without writing back: $ids",
     async ({ ids, expected }) => {
@@ -83,10 +90,7 @@ describe("coolingSelectionStore", () => {
 
       const store = await loadStore();
 
-      expect(store.getState().selection).toEqual({
-        configured: true,
-        selectedOptionIds: expected,
-      });
+      expect(store.getState().selection).toEqual(expected);
       expect(write).not.toHaveBeenCalled();
       expect(storage.get(STORAGE_KEY)).toBe(raw);
     },
@@ -112,6 +116,21 @@ describe("coolingSelectionStore", () => {
     expect(reloadedStore.getState().selection).toEqual({
       configured: true,
       selectedOptionIds: ["fans", "water-dousing"],
+    });
+  });
+
+  it("restores all saved cooling methods after a reload", async () => {
+    const store = await loadStore();
+
+    expect(store.getState().saveSelection(ACTIVE_COOLING_OPTION_IDS)).toBe(
+      true,
+    );
+    vi.resetModules();
+    const reloadedStore = await loadStore();
+
+    expect(reloadedStore.getState().selection).toEqual({
+      configured: true,
+      selectedOptionIds: [...ACTIVE_COOLING_OPTION_IDS],
     });
   });
 

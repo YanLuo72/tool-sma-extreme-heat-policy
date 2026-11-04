@@ -36,12 +36,16 @@ export function loadCoolingSelection(): CoolingSelection<CoolingOptionId> {
         (id): id is string => typeof id === "string",
       )
     ) {
-      return {
-        configured: true,
-        selectedOptionIds: [
-          ...new Set(parsed.selectedOptionIds.filter(isCoolingOptionId)),
-        ],
-      };
+      const selectedOptionIds = [
+        ...new Set(parsed.selectedOptionIds.filter(isCoolingOptionId)),
+      ];
+      if (
+        parsed.selectedOptionIds.length > 0 &&
+        selectedOptionIds.length === 0
+      ) {
+        return { configured: false };
+      }
+      return { configured: true, selectedOptionIds };
     }
   } catch {
     // Unreadable preferences must not prevent Home from rendering.

@@ -7,7 +7,11 @@ import {
   it,
   vi,
 } from "vitest";
-import type { CoolingOptionId, CoolingSelection } from "@/domain/activeCooling";
+import {
+  ACTIVE_COOLING_OPTION_IDS,
+  type CoolingOptionId,
+  type CoolingSelection,
+} from "@/domain/activeCooling";
 import {
   loadCoolingSelection,
   saveCoolingSelection,
@@ -50,6 +54,7 @@ describe("coolingSelectionStorage", () => {
     { configured: false },
     { configured: true, selectedOptionIds: [] },
     { configured: true, selectedOptionIds: ["fans", "water-dousing"] },
+    { configured: true, selectedOptionIds: [...ACTIVE_COOLING_OPTION_IDS] },
   ])(
     "restores the saved state $configured / $selectedOptionIds",
     (selection) => {
@@ -94,20 +99,24 @@ describe("coolingSelectionStorage", () => {
   it.each([
     {
       ids: ["fans", "unknown-option", "water-dousing", "fans"],
-      expected: ["fans", "water-dousing"],
+      expected: {
+        configured: true,
+        selectedOptionIds: ["fans", "water-dousing"],
+      },
     },
-    { ids: ["unknown-option", "another-unknown"], expected: [] },
+    {
+      ids: ["unknown-option", "another-unknown"],
+      expected: { configured: false },
+    },
+    { ids: [], expected: { configured: true, selectedOptionIds: [] } },
   ])(
-    "filters unknown IDs while preserving configured state: $ids",
+    "restores validated IDs without confusing invalid and empty selections: $ids",
     ({ ids, expected }) => {
       const raw = JSON.stringify({ configured: true, selectedOptionIds: ids });
       storage.set(STORAGE_KEY, raw);
       const write = vi.spyOn(window.localStorage, "setItem");
 
-      expect(loadCoolingSelection()).toEqual({
-        configured: true,
-        selectedOptionIds: expected,
-      });
+      expect(loadCoolingSelection()).toEqual(expected);
       expect(storage.get(STORAGE_KEY)).toBe(raw);
       expect(write).not.toHaveBeenCalled();
     },
