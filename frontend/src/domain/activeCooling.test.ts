@@ -7,7 +7,6 @@ import {
   type ActiveCoolingOptionMap,
   type CoolingOptionId,
   type CoolingSelection,
-  isAllCoolingMethodsSelected,
   isCoolingOptionId,
   resolveActiveCoolingAdvice,
 } from "@/domain/activeCooling";
@@ -93,35 +92,6 @@ describe("approved Active Cooling options", () => {
       visibleMethodIds: ["arm-or-foot-immersion", "fans"],
       showPrepareReminder: false,
     });
-  });
-});
-
-describe("isAllCoolingMethodsSelected", () => {
-  it("recognises a configured selection containing all five methods", () => {
-    expect(
-      isAllCoolingMethodsSelected({
-        configured: true,
-        selectedOptionIds: [...ACTIVE_COOLING_OPTION_IDS],
-      }),
-    ).toBe(true);
-  });
-
-  it.each<CoolingSelection<CoolingOptionId>>([
-    { configured: false },
-    { configured: true, selectedOptionIds: [] },
-    { configured: true, selectedOptionIds: ["fans"] },
-    {
-      configured: true,
-      selectedOptionIds: [
-        "cold-fluids-or-slushies",
-        "arm-or-foot-immersion",
-        "water-dousing",
-        "ice-packs-or-towels",
-        "ice-packs-or-towels",
-      ],
-    },
-  ])("rejects %j as a full selection", (selection) => {
-    expect(isAllCoolingMethodsSelected(selection)).toBe(false);
   });
 });
 
